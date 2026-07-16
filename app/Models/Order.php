@@ -36,8 +36,15 @@ class Order extends Model
         return $this->belongsTo(Customer::class);
     }
 
-    public function getTotalAttribute(): string
+    public function getTotalAttribute()
     {
-        return number_format($this->quantity * $this->price, 2);
+        return $this->quantity * $this->price;
+    }
+
+    public static function generateOrderNumber(): string
+    {
+        $lastOrder = self::lockForUpdate()->latest('id')->first();
+        $nextId = $lastOrder ? $lastOrder->id + 1 : 1;
+        return 'ORD-' . now()->format('ymd') . '-' . str_pad((string)$nextId, 4, '0', STR_PAD_LEFT);
     }
 }

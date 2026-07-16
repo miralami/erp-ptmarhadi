@@ -18,7 +18,7 @@
                     <x-badge :status="$order->status" />
                 </div>
                 <p class="text-sm text-slate-500">
-                    {{ $order->date->format('d F Y') }} &middot; PIC: Admin
+                    {{ $order->date->format('d F Y') }}
                 </p>
             </div>
             <a href="{{ route('orders.edit', $order) }}"
@@ -45,7 +45,7 @@
                 <div class="space-y-3">
                     <div>
                         <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Nama</p>
-                        <p class="text-sm font-medium text-slate-900 mt-0.5">{{ $order->customer->name }}</p>
+                        <p class="text-sm font-medium text-slate-900 mt-0.5">{{ $order->customer?->name ?? '-' }}</p>
                     </div>
                     <div>
                         <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Alamat</p>

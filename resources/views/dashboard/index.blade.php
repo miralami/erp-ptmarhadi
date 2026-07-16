@@ -52,7 +52,7 @@
                         {{ $order->order_number }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
-                        {{ $order->customer->name }}
+                        {{ $order->customer?->name ?? '-' }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                         {{ $order->date->format('d/m/Y') }}

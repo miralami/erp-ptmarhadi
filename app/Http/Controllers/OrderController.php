@@ -3,10 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OrderStatus;
+use App\Http\Requests\StoreOrderRequest;
+use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Customer;
 use App\Models\Order;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class OrderController extends Controller
@@ -17,10 +22,12 @@ class OrderController extends Controller
 
         $orders = Order::with('customer')
             ->when($search, function ($query, $search) {
-                $query->where('order_number', 'like', "%{$search}%")
-                    ->orWhereHas('customer', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    });
+                $query->where(function ($q) use ($search) {
+                    $q->where('order_number', 'like', "%{$search}%")
+                        ->orWhereHas('customer', function ($cq) use ($search) {
+                            $cq->where('name', 'like', "%{$search}%");
+                        });
+                });
             })
             ->latest()
             ->paginate(15);
@@ -34,25 +41,28 @@ class OrderController extends Controller
         return view('orders.create', compact('customers'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StoreOrderRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'date' => 'required|date',
-            'product_name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'notes' => 'nullable|string',
-        ]);
+        try {
+            $order = DB::transaction(function () use ($request) {
+                $data = $request->validated();
+                $data['order_number'] = Order::generateOrderNumber();
+                $data['status'] = OrderStatus::ORDER_RECEIVED;
+                return Order::create($data);
+            });
 
-        $lastOrder = Order::latest('id')->first();
-        $nextId = $lastOrder ? $lastOrder->id + 1 : 1;
-        $data['order_number'] = 'ORD-' . now()->format('ymd') . '-' . str_pad((string)$nextId, 4, '0', STR_PAD_LEFT);
-        $data['status'] = OrderStatus::ORDER_RECEIVED;
+            return redirect()->route('orders.index')
+                ->with('success', 'Order berhasil dibuat.');
+        } catch (QueryException $e) {
+            Log::error('Order creation failed', [
+                'error' => $e->getMessage(),
+                'data' => $request->validated(),
+            ]);
 
-        Order::create($data);
-
-        return redirect()->route('orders.index')->with('success', 'Order berhasil dibuat.');
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal membuat order. Silakan coba lagi.');
+        }
     }
 
     public function show(Order $order): View
@@ -67,20 +77,25 @@ class OrderController extends Controller
         return view('orders.edit', compact('order', 'customers'));
     }
 
-    public function update(Request $request, Order $order): RedirectResponse
+    public function update(UpdateOrderRequest $request, Order $order): RedirectResponse
     {
-        $data = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'date' => 'required|date',
-            'product_name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'notes' => 'nullable|string',
-            'status' => 'required|string|in:' . implode(',', array_column(OrderStatus::cases(), 'value')),
-        ]);
+        try {
+            DB::transaction(function () use ($request, $order) {
+                $order->update($request->validated());
+            });
 
-        $order->update($data);
+            return redirect()->route('orders.index')
+                ->with('success', 'Order berhasil diperbarui.');
+        } catch (QueryException $e) {
+            Log::error('Order update failed', [
+                'error' => $e->getMessage(),
+                'order_id' => $order->id,
+                'data' => $request->validated(),
+            ]);
 
-        return redirect()->route('orders.index')->with('success', 'Order berhasil diperbarui.');
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal memperbarui order. Silakan coba lagi.');
+        }
     }
 }
