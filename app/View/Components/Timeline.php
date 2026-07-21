@@ -14,14 +14,9 @@ class Timeline extends Component
     {
         $allSteps = [
             OrderStatus::ORDER_RECEIVED->value => 'Order Diterima',
-            OrderStatus::DELIVERY_SCHEDULED->value => 'Pengiriman Dijadwalkan',
-            OrderStatus::DELIVERED->value => 'Barang Dikirim',
-            OrderStatus::DELIVERY_NOTE_RETURNED->value => 'Surat Jalan Kembali',
-            OrderStatus::WAITING_PO->value => 'Menunggu PO Customer',
-            OrderStatus::INVOICE_CREATED->value => 'Invoice Dibuat',
-            OrderStatus::INVOICE_SENT->value => 'Invoice Dikirim',
-            OrderStatus::UNPAID->value => 'Menunggu Pembayaran',
-            OrderStatus::PAID->value => 'Pembayaran Diterima',
+            OrderStatus::SCHEDULED->value => 'Pengiriman Dijadwalkan',
+            OrderStatus::IN_TRANSIT->value => 'Dalam Perjalanan',
+            OrderStatus::COMPLETED->value => 'Selesai',
         ];
 
         $statusOrder = array_keys($allSteps);

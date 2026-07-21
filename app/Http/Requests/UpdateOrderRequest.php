@@ -16,12 +16,8 @@ class UpdateOrderRequest extends FormRequest
     {
         return [
             'customer_id' => 'required|exists:customers,id',
-            'date' => 'required|date',
-            'product_name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
+            'order_date' => 'required|date',
             'notes' => 'nullable|string',
-            'status' => 'required|string|in:' . implode(',', array_column(OrderStatus::cases(), 'value')),
         ];
     }
 
@@ -30,18 +26,7 @@ class UpdateOrderRequest extends FormRequest
         return [
             'customer_id.required' => 'Pilih customer terlebih dahulu.',
             'customer_id.exists' => 'Customer tidak ditemukan.',
-            'date.required' => 'Tanggal order harus diisi.',
-            'date.date' => 'Format tanggal tidak valid.',
-            'product_name.required' => 'Nama barang harus diisi.',
-            'product_name.max' => 'Nama barang maksimal 255 karakter.',
-            'quantity.required' => 'Jumlah harus diisi.',
-            'quantity.integer' => 'Jumlah harus berupa angka.',
-            'quantity.min' => 'Jumlah minimal 1.',
-            'price.required' => 'Harga harus diisi.',
-            'price.numeric' => 'Harga harus berupa angka.',
-            'price.min' => 'Harga tidak boleh negatif.',
-            'status.required' => 'Status harus dipilih.',
-            'status.in' => 'Status tidak valid.',
+            'order_date.required' => 'Tanggal order harus diisi.',
         ];
     }
 }

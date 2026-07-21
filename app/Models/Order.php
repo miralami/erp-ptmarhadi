@@ -2,32 +2,42 @@
 
 namespace App\Models;
 
+use App\Enums\OrderCategory;
 use App\Enums\OrderStatus;
+use App\Enums\VehicleSource;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'customer_id',
         'order_number',
-        'date',
+        'order_date',
+        'received_by',
+        'origin_company',
+        'origin_city',
+        'destination_city',
+        'category',
+        'vehicle_source',
+        'customer_po_number',
+        'customer_spb_number',
         'status',
-        'product_name',
-        'quantity',
-        'price',
         'notes',
-        'po_number',
-        'delivery_note_number',
-        'invoice_number',
     ];
 
     protected function casts(): array
     {
         return [
-            'date' => 'date',
+            'order_date' => 'date',
             'status' => OrderStatus::class,
-            'price' => 'decimal:2',
+            'category' => OrderCategory::class,
+            'vehicle_source' => VehicleSource::class,
         ];
     }
 
@@ -36,15 +46,23 @@ class Order extends Model
         return $this->belongsTo(Customer::class);
     }
 
-    public function getTotalAttribute()
+    public function items(): HasMany
     {
-        return $this->quantity * $this->price;
+        return $this->hasMany(OrderItem::class);
     }
 
-    public static function generateOrderNumber(): string
+    public function delivery(): HasOne
     {
-        $lastOrder = self::lockForUpdate()->latest('id')->first();
-        $nextId = $lastOrder ? $lastOrder->id + 1 : 1;
-        return 'ORD-' . now()->format('ymd') . '-' . str_pad((string)$nextId, 4, '0', STR_PAD_LEFT);
+        return $this->hasOne(Delivery::class);
+    }
+
+    public function invoice(): HasOne
+    {
+        return $this->hasOne(Invoice::class);
+    }
+
+    public function getTotalAttribute(): float
+    {
+        return $this->items->sum(fn($item) => $item->unit * $item->price);
     }
 }

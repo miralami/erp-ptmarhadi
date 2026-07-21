@@ -2,31 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\OrderStatus;
-use App\Models\Order;
+use App\Services\DashboardService;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
-        $totalOrders = Order::count();
-        $waitingPo = Order::where('status', OrderStatus::WAITING_PO)->count();
-        $noInvoice = Order::whereIn('status', [
-            OrderStatus::ORDER_RECEIVED,
-            OrderStatus::DELIVERY_SCHEDULED,
-            OrderStatus::DELIVERED,
-            OrderStatus::DELIVERY_NOTE_RETURNED,
-            OrderStatus::WAITING_PO,
-        ])->count();
-        $unpaid = Order::where('status', OrderStatus::UNPAID)->count();
+    public function __construct(
+        private DashboardService $dashboardService,
+    ) {}
 
-        $recentOrders = Order::with('customer')
-            ->latest()
-            ->take(10)
-            ->get();
+    public function index(): View
+    {
+        $kpis = $this->dashboardService->getKpis();
+        $monthlyRevenue = $this->dashboardService->getMonthlyRevenue();
+        $invoiceDistribution = $this->dashboardService->getInvoiceStatusDistribution();
+        $topCustomers = $this->dashboardService->getTopCustomers();
+        $paymentTrend = $this->dashboardService->getPaymentTrend();
+        $recentOrders = $this->dashboardService->getRecentOrders();
+        $recentPayments = $this->dashboardService->getRecentPayments();
+        $recentActivities = $this->dashboardService->getRecentActivities();
 
         return view('dashboard.index', compact(
-            'totalOrders', 'waitingPo', 'noInvoice', 'unpaid', 'recentOrders'
+            'kpis',
+            'monthlyRevenue',
+            'invoiceDistribution',
+            'topCustomers',
+            'paymentTrend',
+            'recentOrders',
+            'recentPayments',
+            'recentActivities',
         ));
     }
 }

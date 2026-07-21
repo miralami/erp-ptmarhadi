@@ -9,27 +9,23 @@ class CustomerFactory extends Factory
 {
     protected $model = Customer::class;
 
-    private static array $usedNames = [];
-
     public function definition(): array
     {
-        $names = [
-            'PT Sinar Abadi', 'PT Maju Bersama', 'PT Nusantara Jaya',
-            'PT Cipta Mandiri', 'PT Bumi Sejahtera', 'PT Karya Utama',
-            'PT Indah Purnama', 'PT Harapan Bangsa', 'PT Sentosa Abadi',
-            'PT Mitra Sukses', 'PT Delta Pratama', 'PT Kencana Mulia',
-            'PT Bintang Timur', 'PT Palma Indah', 'PT Guna Persada',
+        $prefixes = ['PT', 'CV', 'UD'];
+        $names = ['Sinar', 'Maju', 'Nusantara', 'Cipta', 'Bumi', 'Karya', 'Indah',
+            'Harapan', 'Sentosa', 'Mitra', 'Delta', 'Kencana', 'Bintang', 'Palma',
+            'Guna', 'Aneka', 'Sumber', 'Cahaya', 'Duta', 'Makmur', 'Prima',
+            'Roda', 'Tunas', 'Usaha', 'Wahana', 'Yasa', 'Zamrud', 'Bahana',
+            'Agung', 'Bhakti', 'Citra', 'Dharma', 'Eka', 'Gita', 'Inti',
         ];
 
-        $available = array_values(array_diff($names, self::$usedNames));
-        $name = $available[array_rand($available)];
-        self::$usedNames[] = $name;
-
         return [
-            'name' => $name,
+            'company_name' => $prefixes[array_rand($prefixes)] . ' ' . $names[array_rand($names)] . ' ' . fake()->randomElement(['Abadi', 'Jaya', 'Sejahtera', 'Mandiri', 'Utama', 'Bersama', 'Mulia', 'Sukses']),
+            'contact_person' => fake()->name(),
             'address' => fake()->streetAddress() . ', ' . fake()->city(),
-            'email' => strtolower(str_replace([' ', 'PT'], '', $name)) . '@gmail.com',
+            'email' => fake()->unique()->safeEmail(),
             'phone' => '021-' . fake()->numerify('#######'),
+            'notes' => fake()->optional(0.3)->sentence(),
         ];
     }
 }

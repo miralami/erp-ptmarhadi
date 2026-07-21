@@ -15,11 +15,12 @@ class StoreOrderRequest extends FormRequest
     {
         return [
             'customer_id' => 'required|exists:customers,id',
-            'date' => 'required|date',
-            'product_name' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
+            'order_date' => 'required|date',
             'notes' => 'nullable|string',
+            'items' => 'required|array|min:1',
+            'items.*.product_name' => 'required|string|max:255',
+            'items.*.unit' => 'nullable|integer|min:0',
+            'items.*.price' => 'required|numeric|min:0',
         ];
     }
 
@@ -28,16 +29,12 @@ class StoreOrderRequest extends FormRequest
         return [
             'customer_id.required' => 'Pilih customer terlebih dahulu.',
             'customer_id.exists' => 'Customer tidak ditemukan.',
-            'date.required' => 'Tanggal order harus diisi.',
-            'date.date' => 'Format tanggal tidak valid.',
-            'product_name.required' => 'Nama barang harus diisi.',
-            'product_name.max' => 'Nama barang maksimal 255 karakter.',
-            'quantity.required' => 'Jumlah harus diisi.',
-            'quantity.integer' => 'Jumlah harus berupa angka.',
-            'quantity.min' => 'Jumlah minimal 1.',
-            'price.required' => 'Harga harus diisi.',
-            'price.numeric' => 'Harga harus berupa angka.',
-            'price.min' => 'Harga tidak boleh negatif.',
+            'order_date.required' => 'Tanggal order harus diisi.',
+            'items.required' => 'Minimal satu item barang harus diisi.',
+            'items.*.product_name.required' => 'Nama barang harus diisi.',
+            'items.*.price.required' => 'Harga barang harus diisi.',
+            'items.*.price.required' => 'Harga barang harus diisi.',
+            'items.*.price.min' => 'Harga barang tidak boleh negatif.',
         ];
     }
 }

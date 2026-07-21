@@ -22,8 +22,9 @@
                     <label for="customer_id" class="block text-sm font-medium text-slate-700 mb-1.5">Customer</label>
                     <select name="customer_id" id="customer_id" required
                             class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
+                        <option value="">Pilih Customer</option>
                         @foreach ($customers as $id => $name)
-                            <option value="{{ $id }}" {{ $order->customer_id == $id ? 'selected' : '' }}>{{ $name }}</option>
+                            <option value="{{ $id }}" {{ old('customer_id', $order->customer_id) == $id ? 'selected' : '' }}>{{ $name }}</option>
                         @endforeach
                     </select>
                     @error('customer_id')
@@ -32,61 +33,19 @@
                 </div>
 
                 <div>
-                    <label for="date" class="block text-sm font-medium text-slate-700 mb-1.5">Tanggal Order</label>
-                    <input type="date" name="date" id="date" value="{{ old('date', $order->date->format('Y-m-d')) }}" required
+                    <label for="order_date" class="block text-sm font-medium text-slate-700 mb-1.5">Tanggal Order</label>
+                    <input type="date" name="order_date" id="order_date" value="{{ old('order_date', $order->order_date->format('Y-m-d')) }}" required
                            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
-                    @error('date')
+                    @error('order_date')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                     @enderror
-                </div>
-
-                <div>
-                    <label for="status" class="block text-sm font-medium text-slate-700 mb-1.5">Status</label>
-                    <select name="status" id="status" required
-                            class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
-                        @foreach (\App\Enums\OrderStatus::cases() as $status)
-                            <option value="{{ $status->value }}" {{ $order->status === $status ? 'selected' : '' }}>
-                                {{ $status->label() }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('status')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div>
-                    <label for="product_name" class="block text-sm font-medium text-slate-700 mb-1.5">Nama Barang</label>
-                    <input type="text" name="product_name" id="product_name" value="{{ old('product_name', $order->product_name) }}" required
-                           class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
-                    @error('product_name')
-                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="quantity" class="block text-sm font-medium text-slate-700 mb-1.5">Jumlah</label>
-                        <input type="number" name="quantity" id="quantity" value="{{ old('quantity', $order->quantity) }}" required min="1"
-                               class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
-                        @error('quantity')
-                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="price" class="block text-sm font-medium text-slate-700 mb-1.5">Harga Satuan</label>
-                        <input type="number" name="price" id="price" value="{{ old('price', $order->price) }}" required min="0" step="0.01"
-                               class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
-                        @error('price')
-                            <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
                 </div>
 
                 <div>
                     <label for="notes" class="block text-sm font-medium text-slate-700 mb-1.5">Catatan <span class="text-slate-400">(opsional)</span></label>
                     <textarea name="notes" id="notes" rows="3"
-                              class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition resize-none">{{ old('notes', $order->notes) }}</textarea>
+                              class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition resize-none"
+                              placeholder="Catatan tambahan...">{{ old('notes', $order->notes) }}</textarea>
                     @error('notes')
                         <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                     @enderror
