@@ -42,7 +42,7 @@
                         <thead class="bg-slate-50">
                             <tr>
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Barang</th>
-                                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Jumlah</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Unit</th>
                                 <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Harga</th>
                                 <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Subtotal</th>
                             </tr>
@@ -51,7 +51,7 @@
                             @forelse ($order->items as $item)
                                 <tr>
                                     <td class="px-4 py-3 text-sm font-medium text-slate-900">{{ $item->product_name }}</td>
-                                    <td class="px-4 py-3 text-sm text-slate-700 text-right">{{ $item->quantity }}</td>
+                                    <td class="px-4 py-3 text-sm text-slate-700 text-right">{{ $item->unit }}</td>
                                     <td class="px-4 py-3 text-sm text-slate-700 text-right">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
                                     <td class="px-4 py-3 text-sm font-medium text-slate-900 text-right">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
                                 </tr>

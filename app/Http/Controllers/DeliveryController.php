@@ -42,8 +42,8 @@ class DeliveryController extends Controller
         $statuses = DeliveryStatus::cases();
         $orders = Order::with('customer')->whereIn('status', [
             OrderStatus::ORDER_RECEIVED,
-            OrderStatus::SCHEDULED,
-            OrderStatus::IN_TRANSIT,
+            OrderStatus::PERJALANAN_MUAT,
+            OrderStatus::PERJALANAN_BONGKAR,
         ])->latest()->get();
 
         return view('deliveries.index', compact('deliveries', 'search', 'status', 'dateFrom', 'dateTo', 'statuses', 'orders'));
@@ -53,7 +53,7 @@ class DeliveryController extends Controller
     {
         $orders = Order::with('customer')->whereIn('status', [
             OrderStatus::ORDER_RECEIVED,
-            OrderStatus::SCHEDULED,
+            OrderStatus::PERJALANAN_MUAT,
         ])->latest()->get();
 
         return view('deliveries.create', compact('orders'));

@@ -39,8 +39,8 @@ class DashboardService
         return [
             'totalOrders' => Order::count(),
             'activeDeliveries' => Order::whereIn('status', [
-                OrderStatus::SCHEDULED,
-                OrderStatus::IN_TRANSIT,
+                OrderStatus::PERJALANAN_MUAT,
+                OrderStatus::PERJALANAN_BONGKAR,
             ])->count(),
             'outstandingInvoices' => Invoice::whereIn('status', [
                 InvoiceStatus::SENT,

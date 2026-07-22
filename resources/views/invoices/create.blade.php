@@ -94,7 +94,7 @@
                         <thead>
                             <tr class="text-left text-xs text-slate-500 uppercase">
                                 <th class="pb-2 pr-2">Barang</th>
-                                <th class="pb-2 pr-2">Qty</th>
+                                <th class="pb-2 pr-2">Unit</th>
                                 <th class="pb-2 pr-2">Harga</th>
                                 <th class="pb-2 text-right">Subtotal</th>
                             </tr>
@@ -105,9 +105,9 @@
                 html += `
                     <tr>
                         <td class="py-2 pr-2 font-medium text-slate-900">${item.product_name}</td>
-                        <td class="py-2 pr-2 text-slate-600">${item.quantity}</td>
+                        <td class="py-2 pr-2 text-slate-600">${item.unit}</td>
                         <td class="py-2 pr-2 text-slate-600">Rp ${Number(item.price).toLocaleString('id-ID')}</td>
-                        <td class="py-2 text-right font-medium text-slate-900">Rp ${Number(item.quantity * item.price).toLocaleString('id-ID')}</td>
+                        <td class="py-2 text-right font-medium text-slate-900">Rp ${Number(item.unit * item.price).toLocaleString('id-ID')}</td>
                     </tr>
                 `;
             });

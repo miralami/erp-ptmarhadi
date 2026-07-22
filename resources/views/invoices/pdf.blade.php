@@ -125,15 +125,15 @@
 
     <div class="totals">
         <div class="row subtotal">
-            <span>Subtotal (Sebelum PPN)</span>
+            <span>Harga sblm PPN</span>
             <span>Rp {{ number_format($invoice->subtotal, 0, ',', '.') }}</span>
         </div>
         <div class="row ppn">
-            <span>PPN {{ $invoice->ppn_rate }}%</span>
+            <span>Nilai PPN</span>
             <span>Rp {{ number_format($invoice->ppn_amount, 0, ',', '.') }}</span>
         </div>
         <div class="row total">
-            <span>Total</span>
+            <span>Total (Setelah PPN)</span>
             <span>Rp {{ number_format($invoice->invoice_total, 0, ',', '.') }}</span>
         </div>
         <div class="row paid">

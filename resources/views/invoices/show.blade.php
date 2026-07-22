@@ -60,7 +60,7 @@
                         <thead>
                             <tr class="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
                                 <th class="pb-3 pr-4">Barang</th>
-                                <th class="pb-3 pr-4">Qty</th>
+                                <th class="pb-3 pr-4">Unit</th>
                                 <th class="pb-3 pr-4">Harga</th>
                                 <th class="pb-3 text-right">Subtotal</th>
                             </tr>
@@ -69,7 +69,7 @@
                             @forelse ($invoice->order->items as $item)
                                 <tr>
                                     <td class="py-3 pr-4 font-medium text-slate-900">{{ $item->product_name }}</td>
-                                    <td class="py-3 pr-4 text-slate-600">{{ $item->quantity }}</td>
+                                    <td class="py-3 pr-4 text-slate-600">{{ $item->unit }}</td>
                                     <td class="py-3 pr-4 text-slate-600">Rp {{ number_format($item->price, 0, ',', '.') }}</td>
                                     <td class="py-3 text-right font-medium text-slate-900">Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
                                 </tr>

@@ -19,13 +19,37 @@
                     <x-badge :label="$order->category->label()" :color="$order->category->color()" />
                 @endif
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-3">
+                @php $transitions = \App\Enums\OrderStatus::allowedTransitions()[$order->status->value] ?? [] @endphp
+                @if (count($transitions) > 0)
+                    <form method="POST" action="{{ route('surat-pengiriman.update-status', $order) }}" class="flex items-center gap-2">
+                        @csrf
+                        <select name="status" required class="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            <option value="">Update status ke...</option>
+                            @foreach ($transitions as $t)
+                                <option value="{{ $t->value }}">{{ $t->label() }}</option>
+                            @endforeach
+                        </select>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                            Simpan
+                        </button>
+                    </form>
+                    <div class="hidden sm:block h-6 w-px bg-slate-200 mx-1"></div>
+                @endif
+
+                <a href="{{ route('surat-pengiriman.edit', $order) }}"
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-700 text-sm font-medium rounded-lg border border-slate-200 hover:bg-slate-50 transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    Edit Order
+                </a>
                 <a href="{{ route('surat-pengiriman.cetak', $order) }}" target="_blank"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-slate-700 text-sm font-medium rounded-xl border border-slate-200 hover:bg-slate-50 transition shadow-sm">
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-700 text-sm font-medium rounded-lg border border-slate-200 hover:bg-slate-50 transition shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                     </svg>
-                    Cetak Surat Jalan
+                    Cetak
                 </a>
             </div>
         </div>
@@ -92,45 +116,60 @@
                 </div>
             </x-card>
 
-            @if ($order->delivery)
-            <x-card>
+            <x-card x-data="{ vehicleSource: '{{ $order->vehicle_source?->value ?? 'OWNED' }}' }">
                 <h2 class="text-base font-semibold text-slate-900 mb-4">Detail Pengiriman</h2>
                 <form method="POST" action="{{ route('surat-pengiriman.update-delivery', $order) }}" class="space-y-4">
                     @csrf
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-1.5">Driver</label>
-                            <input type="text" name="driver_name" value="{{ old('driver_name', $order->delivery->driver_name) }}"
+                            <input type="text" name="driver_name" value="{{ old('driver_name', $order->delivery?->driver_name) }}"
+                                   placeholder="Nama driver"
                                    class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Kendaraan (Milik)</label>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Sumber Kendaraan</label>
+                            <select x-model="vehicleSource" class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
+                                <option value="OWNED">Milik (Marhadi)</option>
+                                <option value="RENTED">Sewa</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div x-show="vehicleSource === 'OWNED'" class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Kendaraan</label>
                             <select name="vehicle_id"
                                     class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
                                 <option value="">Pilih Kendaraan</option>
                                 @foreach ($vehicles as $v)
-                                    <option value="{{ $v->id }}" {{ old('vehicle_id', $order->delivery->vehicle_id) == $v->id ? 'selected' : '' }}>
+                                    <option value="{{ $v->id }}" {{ old('vehicle_id', $order->delivery?->vehicle_id) == $v->id ? 'selected' : '' }}>
                                         {{ $v->plate_number }} - {{ $v->brand }} {{ $v->model }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div x-show="vehicleSource === 'RENTED'" class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Plat No (Sewa)</label>
-                            <input type="text" name="vehicle_plate_manual" value="{{ old('vehicle_plate_manual', $order->delivery->vehicle_plate_manual) }}"
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Plat No</label>
+                            <input type="text" name="vehicle_plate_manual" value="{{ old('vehicle_plate_manual', $order->delivery?->vehicle_plate_manual) }}"
+                                   placeholder="Nomor plat kendaraan"
                                    class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Tipe Kendaraan (Sewa)</label>
-                            <input type="text" name="vehicle_type_manual" value="{{ old('vehicle_type_manual', $order->delivery->vehicle_type_manual) }}"
-                                   class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Tipe Kendaraan</label>
+                            <select name="vehicle_type_manual"
+                                    class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
+                                <option value="">Pilih Tipe</option>
+                                @foreach (\App\Enums\VehicleType::cases() as $vt)
+                                    <option value="{{ $vt->value }}" {{ old('vehicle_type_manual', $order->delivery?->vehicle_type_manual) === $vt->value ? 'selected' : '' }}>{{ $vt->label() }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-1.5">Uang Jalan</label>
-                        <input type="number" name="uang_jalan" value="{{ old('uang_jalan', $order->delivery->uang_jalan) }}" min="0"
+                        <input type="number" name="uang_jalan" value="{{ old('uang_jalan', $order->delivery?->uang_jalan) }}" min="0"
                                class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
                     </div>
                     <div>
@@ -139,7 +178,7 @@
                             <button type="button" id="add-expense" class="text-xs text-indigo-600 hover:text-indigo-700 font-medium">+ Tambah</button>
                         </div>
                         <div id="expenses-container" class="space-y-2">
-                            @forelse ($order->delivery->expenses as $i => $expense)
+                            @forelse ($order->delivery?->expenses ?? [] as $i => $expense)
                                 <div class="expense-row flex gap-2 items-start">
                                     <input type="text" name="expenses[{{ $i }}][description]" value="{{ $expense->description }}" placeholder="Keterangan"
                                            class="flex-1 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg">
@@ -161,7 +200,7 @@
                 </form>
 
                 <script>
-                    let expenseIndex = {{ $order->delivery->expenses->count() }};
+                    let expenseIndex = {{ $order->delivery?->expenses->count() ?? 0 }};
                     document.getElementById('add-expense')?.addEventListener('click', function() {
                         const container = document.getElementById('expenses-container');
                         const noMsg = document.getElementById('no-expenses');
@@ -185,63 +224,6 @@
                     });
                 </script>
             </x-card>
-            @endif
-
-            @if ($order->delivery && in_array($order->status->value, ['IN_TRANSIT', 'COMPLETED']))
-            <x-card>
-                <div class="flex items-start gap-8">
-                    <div class="flex-shrink-0">
-                        <h2 class="text-base font-semibold text-slate-900 mb-4">Status Progres</h2>
-                        <x-timeline :status="$order->status" />
-                    </div>
-                    <div class="flex-1">
-                        <h2 class="text-base font-semibold text-slate-900 mb-4">Dokumentasi</h2>
-                        <form method="POST" action="{{ route('surat-pengiriman.upload-photos', $order) }}" class="space-y-4">
-                            @csrf
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Foto Muat</label>
-                                <input type="hidden" name="photo_type" value="photo_muat">
-                                <textarea name="photos[]" rows="2" placeholder="URL foto (pisahkan dengan baris baru)"
-                                          class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg">{{ $order->delivery->photo_muat ? implode("\n", $order->delivery->photo_muat) : '' }}</textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Foto Bongkar</label>
-                                <input type="hidden" name="photo_type" value="photo_bongkar">
-                                <textarea name="photos[]" rows="2" placeholder="URL foto (pisahkan dengan baris baru)"
-                                          class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg">{{ $order->delivery->photo_bongkar ? implode("\n", $order->delivery->photo_bongkar) : '' }}</textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Foto Surat Jalan</label>
-                                <input type="hidden" name="photo_type" value="photo_surat_jalan">
-                                <textarea name="photos[]" rows="2" placeholder="URL foto (pisahkan dengan baris baru)"
-                                          class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg">{{ $order->delivery->photo_surat_jalan ? implode("\n", $order->delivery->photo_surat_jalan) : '' }}</textarea>
-                            </div>
-                            <div class="flex justify-end">
-                                <button type="submit"
-                                        class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition">
-                                    Simpan Foto
-                                </button>
-                            </div>
-                        </form>
-
-                        @if ($order->delivery->photo_muat || $order->delivery->photo_bongkar || $order->delivery->photo_surat_jalan)
-                            <div class="grid grid-cols-3 gap-4 mt-4">
-                                @foreach (['photo_muat' => 'Foto Muat', 'photo_bongkar' => 'Foto Bongkar', 'photo_surat_jalan' => 'Foto Surat Jalan'] as $key => $label)
-                                    @if ($order->delivery->$key)
-                                        <div>
-                                            <p class="text-xs font-medium text-slate-500 mb-1">{{ $label }}</p>
-                                            @foreach ($order->delivery->$key as $photo)
-                                                <img src="{{ $photo }}" class="w-full h-24 object-cover rounded-lg mb-1" alt="{{ $label }}">
-                                            @endforeach
-                                        </div>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </x-card>
-            @endif
 
             @if ($order->invoice)
             <x-card>
@@ -261,20 +243,59 @@
 
         <div class="lg:col-span-1 space-y-6">
             <x-card>
-                <h2 class="text-base font-semibold text-slate-900 mb-4">Ubah Status</h2>
-                <form method="POST" action="{{ route('surat-pengiriman.update-status', $order) }}">
-                    @csrf
-                    <select name="status" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl mb-3">
-                        @foreach (\App\Enums\OrderStatus::cases() as $s)
-                            <option value="{{ $s->value }}" {{ $order->status === $s ? 'selected' : '' }}>{{ $s->label() }}</option>
-                        @endforeach
-                    </select>
-                    <button type="submit"
-                            class="w-full px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition">
-                        Update Status
-                    </button>
-                </form>
+                <h2 class="text-base font-semibold text-slate-900 mb-4">Status Progres</h2>
+                <x-timeline :status="$order->status" />
             </x-card>
+
+            @if ($order->delivery)
+            <x-card>
+                <h2 class="text-base font-semibold text-slate-900 mb-4">Dokumentasi</h2>
+                <div class="space-y-3">
+                    @php
+                        $photoTypes = [
+                            'photo_muat' => 'Muat',
+                            'photo_bongkar' => 'Bongkar',
+                            'photo_surat_jalan' => 'Surat Jalan',
+                        ];
+                        $icons = [
+                            'photo_muat' => '⬆',
+                            'photo_bongkar' => '⬇',
+                            'photo_surat_jalan' => '📄',
+                        ];
+                    @endphp
+                    @foreach ($photoTypes as $key => $label)
+                        <div class="relative pl-8 pb-3 border-l-2 border-slate-200 last:border-l-2 last:pb-0">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-indigo-500 flex items-center justify-center">
+                                <div class="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                            </div>
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="text-sm font-semibold text-slate-700">{{ $label }}</h3>
+                                <form method="POST" action="{{ route('surat-pengiriman.upload-photos', $order) }}" enctype="multipart/form-data" class="flex items-center gap-1.5">
+                                    @csrf
+                                    <input type="hidden" name="photo_type" value="{{ $key }}">
+                                    <input type="file" name="photos[]" multiple accept="image/*"
+                                           class="text-[10px] text-slate-500 file:mr-1 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[10px] file:font-medium file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 cursor-pointer w-24">
+                                    <button type="submit" class="px-2 py-0.5 text-[10px] font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 transition">
+                                        Upload
+                                    </button>
+                                </form>
+                            </div>
+                            @if ($order->delivery->$key)
+                                <div class="flex gap-2 flex-wrap">
+                                    @foreach ($order->delivery->$key as $photo)
+                                        <a href="{{ \Illuminate\Support\Facades\Storage::url($photo) }}" target="_blank" class="block group overflow-hidden rounded-lg border border-slate-200 w-20 h-20">
+                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($photo) }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $label }}">
+                                        </a>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p class="text-[11px] text-slate-400 italic">Belum ada foto</p>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </x-card>
+            @endif
 
             @if ($order->invoice)
             <x-card>

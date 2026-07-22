@@ -45,6 +45,7 @@
                     <div>
                         <label for="received_by" class="block text-sm font-medium text-slate-700 mb-1.5">Diterima Oleh</label>
                         <input type="text" name="received_by" id="received_by" value="{{ old('received_by') }}"
+                               placeholder="Nama yang menerima order"
                                class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
                         @error('received_by')
                             <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
@@ -53,11 +54,22 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="origin_company" class="block text-sm font-medium text-slate-700 mb-1.5">Asal (Perusahaan)</label>
-                        <input type="text" name="origin_company" id="origin_company" value="{{ old('origin_company') }}"
-                               placeholder="PT Marhadi"
-                               class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
+                    <div x-data="{ isMarhadi: true }">
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Asal (Perusahaan)</label>
+                        <label class="inline-flex items-center gap-2 mb-2 text-sm text-slate-600 cursor-pointer">
+                            <input type="checkbox" x-model="isMarhadi" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" checked>
+                            PT Marhadi
+                        </label>
+                        <template x-if="isMarhadi">
+                            <input type="text" name="origin_company" value="{{ old('origin_company', $companyName) }}"
+                                   class="w-full px-4 py-2.5 text-sm bg-slate-100 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed"
+                                   readonly>
+                        </template>
+                        <template x-if="!isMarhadi">
+                            <input type="text" name="origin_company" value="{{ old('origin_company') }}"
+                                   placeholder="Nama perusahaan"
+                                   class="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
+                        </template>
                         @error('origin_company')
                             <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror

@@ -17,6 +17,7 @@ Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::resource('customers', CustomerController::class);
 Route::resource('orders', OrderController::class);
 Route::post('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
+Route::get('orders/{order}/items', [OrderController::class, 'getItems'])->name('orders.items');
 
 Route::resource('deliveries', DeliveryController::class);
 Route::resource('invoices', InvoiceController::class);
@@ -41,4 +42,6 @@ Route::prefix('surat-pengiriman')->name('surat-pengiriman.')->controller(SuratPe
     Route::post('{surat_pengiriman}/delivery', 'updateDelivery')->name('update-delivery');
     Route::post('{surat_pengiriman}/photos', 'uploadPhotos')->name('upload-photos');
     Route::get('{surat_pengiriman}/cetak', 'cetak')->name('cetak');
+    Route::get('{surat_pengiriman}/edit', 'edit')->name('edit');
+    Route::put('{surat_pengiriman}', 'update')->name('update');
 });

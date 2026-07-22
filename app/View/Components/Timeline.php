@@ -14,8 +14,8 @@ class Timeline extends Component
     {
         $allSteps = [
             OrderStatus::ORDER_RECEIVED->value => 'Order Diterima',
-            OrderStatus::SCHEDULED->value => 'Pengiriman Dijadwalkan',
-            OrderStatus::IN_TRANSIT->value => 'Dalam Perjalanan',
+            OrderStatus::PERJALANAN_MUAT->value => 'Perjalanan Muat',
+            OrderStatus::PERJALANAN_BONGKAR->value => 'Perjalanan Bongkar',
             OrderStatus::COMPLETED->value => 'Selesai',
         ];
 

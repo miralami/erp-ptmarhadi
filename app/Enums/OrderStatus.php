@@ -5,8 +5,8 @@ namespace App\Enums;
 enum OrderStatus: string
 {
     case ORDER_RECEIVED = 'ORDER_RECEIVED';
-    case SCHEDULED = 'SCHEDULED';
-    case IN_TRANSIT = 'IN_TRANSIT';
+    case PERJALANAN_MUAT = 'PERJALANAN_MUAT';
+    case PERJALANAN_BONGKAR = 'PERJALANAN_BONGKAR';
     case COMPLETED = 'COMPLETED';
     case CANCELLED = 'CANCELLED';
 
@@ -14,8 +14,8 @@ enum OrderStatus: string
     {
         return match ($this) {
             self::ORDER_RECEIVED => 'Order Baru',
-            self::SCHEDULED => 'Dijadwalkan',
-            self::IN_TRANSIT => 'Dalam Perjalanan',
+            self::PERJALANAN_MUAT => 'Perjalanan Muat',
+            self::PERJALANAN_BONGKAR => 'Perjalanan Bongkar',
             self::COMPLETED => 'Selesai',
             self::CANCELLED => 'Dibatalkan',
         };
@@ -25,8 +25,8 @@ enum OrderStatus: string
     {
         return match ($this) {
             self::ORDER_RECEIVED => 'blue',
-            self::SCHEDULED => 'indigo',
-            self::IN_TRANSIT => 'amber',
+            self::PERJALANAN_MUAT => 'amber',
+            self::PERJALANAN_BONGKAR => 'orange',
             self::COMPLETED => 'emerald',
             self::CANCELLED => 'red',
         };
@@ -36,8 +36,8 @@ enum OrderStatus: string
     {
         return match ($this) {
             self::ORDER_RECEIVED => 'package',
-            self::SCHEDULED => 'calendar',
-            self::IN_TRANSIT => 'truck',
+            self::PERJALANAN_MUAT => 'truck',
+            self::PERJALANAN_BONGKAR => 'map-pin',
             self::COMPLETED => 'check-circle',
             self::CANCELLED => 'x-circle',
         };
@@ -46,9 +46,9 @@ enum OrderStatus: string
     public static function allowedTransitions(): array
     {
         return [
-            self::ORDER_RECEIVED->value => [self::SCHEDULED, self::CANCELLED],
-            self::SCHEDULED->value => [self::IN_TRANSIT, self::CANCELLED],
-            self::IN_TRANSIT->value => [self::COMPLETED, self::CANCELLED],
+            self::ORDER_RECEIVED->value => [self::PERJALANAN_MUAT, self::CANCELLED],
+            self::PERJALANAN_MUAT->value => [self::PERJALANAN_BONGKAR, self::CANCELLED],
+            self::PERJALANAN_BONGKAR->value => [self::COMPLETED, self::CANCELLED],
             self::COMPLETED->value => [],
             self::CANCELLED->value => [],
         ];

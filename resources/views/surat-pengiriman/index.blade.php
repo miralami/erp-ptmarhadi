@@ -15,6 +15,30 @@
         </a>
     </div>
 
+    @if (count($pendingOrders) > 0)
+    <div class="mb-8">
+        <div class="flex items-center gap-2 mb-3">
+            <span class="flex h-2.5 w-2.5 rounded-full bg-indigo-600"></span>
+            <h2 class="text-sm font-semibold text-slate-900">Perlu Aksi ({{ count($pendingOrders) }})</h2>
+            <span class="text-sm text-slate-500">— Menunggu data pengiriman diisi</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach ($pendingOrders as $pending)
+                <a href="{{ route('surat-pengiriman.show', $pending) }}" class="group bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-300 hover:shadow-md transition">
+                    <div class="flex items-start justify-between mb-2">
+                        <span class="text-sm font-semibold text-indigo-600 group-hover:text-indigo-700">{{ $pending->order_number }}</span>
+                        <svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm font-medium text-slate-900 truncate">{{ $pending->customer->company_name }}</p>
+                    <p class="text-xs text-slate-500 mt-1">{{ $pending->origin_city ?? 'Asal ?' }} → {{ $pending->destination_city ?? 'Tujuan ?' }}</p>
+                </a>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     <x-card class="!p-0">
         <div class="p-4 border-b border-slate-100">
             <form method="GET" action="{{ route('surat-pengiriman.index') }}" class="flex flex-wrap gap-3">

@@ -127,6 +127,21 @@ class OrderController extends Controller
         }
     }
 
+    public function getItems(Order $order): \Illuminate\Http\JsonResponse
+    {
+        $order->load('items');
+        return response()->json([
+            'items' => $order->items->map(fn($item) => [
+                'product_name' => $item->product_name,
+                'unit' => $item->unit,
+                'kubikasi' => $item->kubikasi,
+                'price' => $item->price,
+                'subtotal' => $item->subtotal,
+            ]),
+            'total' => $order->total,
+        ]);
+    }
+
     public function updateStatus(Request $request, Order $order): RedirectResponse
     {
         $request->validate([

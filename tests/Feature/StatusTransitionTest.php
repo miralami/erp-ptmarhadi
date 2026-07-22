@@ -24,9 +24,9 @@ class StatusTransitionTest extends TestCase
     {
         $order = Order::factory()->create(['status' => OrderStatus::ORDER_RECEIVED]);
 
-        $this->service->transition($order, OrderStatus::SCHEDULED);
+        $this->service->transition($order, OrderStatus::PERJALANAN_MUAT);
 
-        $this->assertEquals(OrderStatus::SCHEDULED, $order->fresh()->status);
+        $this->assertEquals(OrderStatus::PERJALANAN_MUAT, $order->fresh()->status);
     }
 
     public function test_prevents_invalid_transition(): void
@@ -42,8 +42,8 @@ class StatusTransitionTest extends TestCase
     {
         $statuses = [
             OrderStatus::ORDER_RECEIVED,
-            OrderStatus::SCHEDULED,
-            OrderStatus::IN_TRANSIT,
+            OrderStatus::PERJALANAN_MUAT,
+            OrderStatus::PERJALANAN_BONGKAR,
         ];
 
         foreach ($statuses as $status) {
@@ -67,8 +67,8 @@ class StatusTransitionTest extends TestCase
         $order = Order::factory()->create(['status' => OrderStatus::ORDER_RECEIVED]);
 
         $transitions = [
-            OrderStatus::SCHEDULED,
-            OrderStatus::IN_TRANSIT,
+            OrderStatus::PERJALANAN_MUAT,
+            OrderStatus::PERJALANAN_BONGKAR,
             OrderStatus::COMPLETED,
         ];
 
@@ -83,11 +83,11 @@ class StatusTransitionTest extends TestCase
         $order = Order::factory()->create(['status' => OrderStatus::ORDER_RECEIVED]);
 
         $response = $this->post(route('orders.update-status', $order), [
-            'status' => OrderStatus::SCHEDULED->value,
+            'status' => OrderStatus::PERJALANAN_MUAT->value,
         ]);
 
         $response->assertSessionHas('success');
-        $this->assertEquals(OrderStatus::SCHEDULED, $order->fresh()->status);
+        $this->assertEquals(OrderStatus::PERJALANAN_MUAT, $order->fresh()->status);
     }
 
     public function test_http_endpoint_rejects_invalid_transition(): void
@@ -95,7 +95,7 @@ class StatusTransitionTest extends TestCase
         $order = Order::factory()->create(['status' => OrderStatus::ORDER_RECEIVED]);
 
         $response = $this->post(route('orders.update-status', $order), [
-            'status' => OrderStatus::IN_TRANSIT->value,
+            'status' => OrderStatus::PERJALANAN_BONGKAR->value,
         ]);
 
         $response->assertSessionHas('error');
